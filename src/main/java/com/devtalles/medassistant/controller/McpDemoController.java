@@ -1,0 +1,35 @@
+package com.devtalles.medassistant.controller;
+
+import com.devtalles.medassistant.config.ClientResolver;
+import com.devtalles.medassistant.dto.ChatRequestDTO;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/api/v1/mcp")
+@Profile("!aws")
+@RequiredArgsConstructor
+public class McpDemoController {
+
+	private final ClientResolver clientResolver;
+	private final ToolCallbackProvider mcpTools; // Con esto tiene acceso a todas las tools disponibles en nuestra application.yml MCPs
+
+	@PostMapping("/demo")
+	public ResponseEntity<String> demo(@Valid @RequestBody ChatRequestDTO request) {
+		String response = ChatClient.create(clientResolver.resolveModel(request.model()))
+			.prompt()
+			.user(request.prompt())
+			.tools(mcpTools) // Es el starter que nos da automaticamente todos los tools de los MCP Servers conectados.
+			.call()
+			.content();
+		return ResponseEntity.ok(response);
+	}
+}

@@ -1,0 +1,2 @@
+-- IF NOT EXISTS: Esto es indepotente. Significa que si ejecutamos una accion varias veces, el resultado sera exactamente el mismo que si lo ejecutaras 1 vez.
+CREATE EXTENSION IF NOT EXISTS vector; -- Habilitamos el tipo de dato vector en Postgres para que PgVector funcione dentro de postgres

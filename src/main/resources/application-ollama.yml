@@ -1,0 +1,24 @@
+spring:
+  # Cuando activamos el perfil, tenemos eque excluir al otro.
+  # Esto es debido a que el PERFIL funciona, pero la autoconfiguración no mira perfiles, mira nuestro
+  # pom.xml. El perfil controla qué configuración se carga. La autoconfiguración controla qué beans se crean
+  # según que jars se encuentran en el pom.xml.
+  #  autoconfigure:
+  #    exclude:
+  #      - org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+  #      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration
+  #      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration
+  #      - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
+  #      - org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration
+  #      - org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration
+  # Borramos los exclude porque queremos a los dos activos, y que el perfil controle cuál se usa.
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: llama3.2:1b
+        temperature: 0.2 # Para que sea más determinista y no invente cosas.
+        top-p: 0.85
+        num-predict: 2048
+      embedding:
+        model: nomic-embed-text # Tenemos que descargarlo: ollama pull nomic-embed-text

@@ -1,0 +1,20 @@
+spring:
+  # Cuando activamos el perfil, tenemos eque excluir al otro.
+  # Esto es debido a que el PERFIL funciona, pero la autoconfiguración no mira perfiles, mira nuestro
+  # pom.xml. El perfil controla qué configuración se carga. La autoconfiguración controla qué beans se crean
+  # según que jars se encuentran en el pom.xml.
+  #  autoconfigure:
+  #    exclude:
+  #      - org.springframework.ai.model.ollama.autoconfigure.OllamaChatAutoConfiguration
+  # Borramos los exclude porque queremos a los dos activos, y que el perfil controle cuál se usa.
+  ai:
+    openai:
+      api-key: ${OPEN_AI_API_KEY}
+      chat:
+        model: gpt-4o
+        temperature: 0.2 # Para que sea más determinista y no invente cosas.
+        top-p: 0.85 # Para descatar los tokens menos probables.
+        max-tokens: 2048 # Gestionar costos
+      embedding:
+        model: text-embedding-3-large
+        api-key: ${OPEN_AI_API_KEY}

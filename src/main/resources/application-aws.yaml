@@ -1,0 +1,51 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.vectorstore.chroma.autoconfigure.ChromaVectorStoreAutoConfiguration
+      # Lo exluimos porque nosotros vamos a configuirarlo en una clase de configuracion de forma manual
+      - org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration
+      - org.springframework.ai.model.ollama.autoconfigure.OllamaChatAutoConfiguration
+      - org.springframework.ai.model.ollama.autoconfigure.OllamaEmbeddingAutoConfiguration
+
+  datasource:
+    url: jdbc:postgresql://${RDS_HOST:localhost}:${RDS_PORT:5432}/${RDS_DB:medassistant}
+    username: ${RDS_USERNAME:postgres}
+    password: ${RDS_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update # Mantiene en los datos que hay en cada reinicio y solo aplica cambios de esquema
+
+  sql:
+    init: # Ejecuta el codigo antes de que JPA inicialice.
+      mode: always
+      schema-locations: classpath:schema-aws.sql
+      continue-on-error: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8090/realms/medassistant}
+
+  ai:
+    openai:
+      api-key: ${OPEN_AI_API_KEY}
+      chat:
+        model: gpt-4o
+        temperature: 0.2 # Para que sea más determinista y no invente cosas.
+        top-p: 0.85 # Para descatar los tokens menos probables.
+        max-tokens: 2048 # Gestionar costos
+      embedding:
+        model: text-embedding-3-large
+        api-key: ${OPEN_AI_API_KEY}
+
+    mcp:
+      client:
+        enabled: false
+        stdio:
+          connections: { }
+      server:
+        name: medassistant-mcp
+        version: 1.0.0
+        protocol: STATELESS

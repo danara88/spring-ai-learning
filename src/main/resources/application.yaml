@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: medassistant
+  datasource:
+    url: jdbc:postgresql://localhost:5432/medassistant
+    username: sa
+    password: 12345
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/medassistant # Es como una manual de usuario para spring security
+  ai:
+    mcp:
+      # http://localhost:8080/mcp El starter automaticamente expone la ruta /mcp
+      # Content-type: application/json
+      # Accept: text/event-stream, application/json IMPORTANTE poner este header. Ya que el MCP puede responser como un JSON o un stream de eventos
+      server:
+        name: medassistant-mcp
+        version: 1.0.0
+        # Sin estado, cada request del MCP server es independiente. No hay sesión que mantener entre llamadas.
+        protocol: stateless
+      client:
+        stdio:
+          connections:
+            filesystem:
+              # Ruta del ejecutable del MCP Server
+              command: /Users/US4BXPH/.nvm/versions/node/v20.18.0/bin/mcp-server-filesystem
+              args:
+                # Ruta donde tenemos los directios que queremos leer
+                - /Users/US4BXPH/Documents/personal/repositories/spring-ai-devtalles/medassistant/src/main/resources/prompts
+              env:
+                # Dentro de esta carpeta tenemos a npm, node, npx, etc
+                # El server necesita esta carpeta para ejecutarse
+                PATH: /Users/US4BXPH/.nvm/versions/node/v20.18.0/bin:/usr/bin:/bin
+            github:
+              command: /Users/US4BXPH/.nvm/versions/node/v20.18.0/bin/mcp-server-github
+              args:
+                - ""
+              env:
+                GITHUB_PERSONAL_ACCESS_TOKEN: ${GITHUB_TOKEN}
+                PATH: /Users/US4BXPH/.nvm/versions/node/v20.18.0/bin:/usr/bin:/bin
+            engram:
+              command: /opt/homebrew/bin/engram
+              args:
+                - "mcp"
+              env:
+                HOME: /Users/US4BXPH
+                PATH: /opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin
+    chat:
+      memory:
+        repository:
+          jdbc:
+            # Crea la tabla si no existe
+            # Para bases de datos en memoria como H2, spring Ai lo crea por defecto.
+            # Crea la tabla en cada arranque sin importar el tipo de base de datos.
+            # emebeded -> Crea la tabla solo si la base de datos es emebebida (H2, HSQLDB, Derby)
+            # never -> No crea la tabla nunca. En produccion se usan herramientas de migracion como flyway.
+            # Cada cambio queda registrada en un archivo de migración.
+            # Por lo que la tabla que se crea automatiocamente, la crea un script de flyway (responsabilidad de flyway)
+            initialize-schema: always
+    vectorstore:
+      chroma: # Este nombre lo define Spring AI.
+        url: http://localhost:8000
+        # Eliminamos estas propiedades, ya que ya las configuramos manualmente en el bean ChromaVectorStoreConfiguration.
+  #        collection-name: medassistant
+  #        initialize-schema: true
+  autoconfigure:
+    exclude:
+      # No te preocupes de la configuracion de Chroma, yo lo haré manualmente.
+      # Esta es la configuración que crea el bean de ChromaApi.
+      # Como lo excluimos, tenemos que crear el ChromaApi Bean manualmente.
+      - org.springframework.ai.vectorstore.chroma.autoconfigure.ChromaVectorStoreAutoConfiguration

@@ -1,0 +1,14 @@
+package com.devtalles.medassistant.config;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.vectorstore.VectorStore;
+
+public interface ClientResolver {
+
+	ChatClient resolveClient(String model);
+
+	ChatModel resolveModel(String model);
+
+	VectorStore resolveVectorStore(String model);
+}

@@ -1,0 +1,18 @@
+package com.devtalles.medassistant.service;
+
+import reactor.core.publisher.Flux;
+
+public interface AssistantService {
+
+	String chat(String prompt, String model, Long userId, String role);
+
+	Flux<String> chatStream(String prompt, String model, Long userId, String role);
+
+	String explainCondition(String condition, String model);
+
+	String analyzeSymptoms(String symptoms, String model, Long userId);
+
+	String diagnoseWithReasoning(String symptoms, String model, Long userId);
+
+	String consult(String consult, String model, Long userId);
+}
